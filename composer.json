@@ -1,0 +1,27 @@
+{
+    "name": "cosmoscript/laravel-scoped-visibility",
+    "description":"laravel-scope-visibility",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Simon Diaz",
+            "email": "simon@cosmoscript.net"
+        }
+    ],
+    "require": {
+        "php": ">=8.0",
+        "illuminate/support": "^8.0|^9.0|^10.0|^11.0|^12.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Cosmoscript\\ScopedVisibility\\": "./src"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Cosmoscript\\ScopedVisibility\\ScopedVisibilityServiceProvider"
+            ]
+        }
+    }
+}
