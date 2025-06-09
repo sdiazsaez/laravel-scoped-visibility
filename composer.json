@@ -1,6 +1,6 @@
 {
-    "name": "cosmoscript/laravel-scoped-visibility",
-    "description":"laravel-scope-visibility",
+    "name": "cosmoscript/scoped-visibility",
+    "description":"scoped-visibility",
     "license": "MIT",
     "authors": [
         {
