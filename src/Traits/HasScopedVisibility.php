@@ -42,7 +42,7 @@ trait HasScopedVisibility {
         return $query;
     }
 
-    protected function scopeIdentifier(string $key): string
+    public function scopeIdentifier(string $key): string
     {
         return 'scoped_flag:' . $key;
     }
@@ -55,5 +55,5 @@ trait HasScopedVisibility {
      *     'imported' => fn() => $this->query()->whereNotIn('id', ...)
      *   ];
      */
-    abstract protected function scopedFlags(): array;
+    abstract public function scopedFlags(): array;
 }
