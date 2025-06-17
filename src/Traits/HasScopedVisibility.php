@@ -47,6 +47,41 @@ trait HasScopedVisibility {
         return 'scoped_flag:' . $key;
     }
 
+    
+    public function scopeApplyVisibility(Builder $query, array $flags = []): Builder
+    {
+        $model = $query->getModel();
+    
+        if (!method_exists($model, 'scopedFlags')) {
+            return $query;
+        }
+    
+        $availableFlags = $model->scopedFlags();
+        $validModes = ['only', 'with'];
+    
+        foreach ($flags as $key => $mode) {
+            $mode = strtolower(trim($mode));
+    
+            if (!in_array($mode, $validModes, true)) {
+                continue;
+            }
+    
+            if (!array_key_exists($key, $availableFlags)) {
+                continue;
+            }
+    
+            $method = $mode . 'Scope';
+    
+            if (method_exists($query, $method)) {
+                $query->{$method}($key);
+            }
+        }
+    
+        return $query;
+    }
+
+
+
     /**
      * Each model using this trait must implement scopedFlags(), returning an array of [key => filterQuery closure].
      *
