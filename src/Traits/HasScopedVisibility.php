@@ -8,11 +8,6 @@ use Cosmoscript\ScopedVisibility\ScopedVisibilityScope;
 trait HasScopedVisibility {
     protected array $scopedVisibilityOverrides = [];
 
-    public static function bootHasScopedVisibility(): void
-    {
-        static::addGlobalScope(new ScopedVisibilityScope);
-    }
-
     public function isScopeOverridden(string $scopeKey): bool
     {
         return $this->scopedVisibilityOverrides[$scopeKey] ?? false;
