@@ -15,7 +15,6 @@ class ScopedVisibilityScope implements Scope
             return;
         }
 
-
         foreach ($model->scopedFlags() as $key => $filterCallback) {
             $identifier = $model->scopeIdentifier($key);
 

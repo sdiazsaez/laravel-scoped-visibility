@@ -34,51 +34,49 @@ class ApplyScopedVisibility
      */
     public function handle(Request $request, Closure $next)
     {
-        if (!Builder::hasMacro('applyVisibility')) {
-            Builder::macro('applyVisibility', function (?array $flags = null) {
-                if (is_null($flags)) {
-                    if (!RequestFacade::has('visibility')) {
-                        return $this;
-                    }
-            
-                    $flags = RequestFacade::input('visibility');
-                }
-            
-                if (!is_array($flags) || empty($flags)) {
+        Builder::macro('applyVisibility', function (?array $flags = null) {
+            if (is_null($flags)) {
+                if (!RequestFacade::has('visibility')) {
                     return $this;
                 }
 
-                /** @var \Illuminate\Database\Eloquent\Model $model */
-                $model = $this->getModel();
+                $flags = RequestFacade::input('visibility');
+            }
 
-                if (!method_exists($model, 'scopedFlags')) {
-                    return $this;
-                }
-
-                $availableFlags = $model->scopedFlags();
-                $validModes = ['only', 'with'];
-
-                foreach ($flags as $key => $mode) {
-                    $mode = strtolower(trim($mode));
-
-                    if (!in_array($mode, $validModes, true)) {
-                        continue;
-                    }
-
-                    if (!array_key_exists($key, $availableFlags)) {
-                        continue;
-                    }
-
-                    $method = $mode . 'Scope';
-
-                    if (method_exists($this, $method)) {
-                        $this->$method($key);
-                    }
-                }
-
+            if (!is_array($flags) || empty($flags)) {
                 return $this;
-            });
-        }
+            }
+
+            /** @var \Illuminate\Database\Eloquent\Model $model */
+            $model = $this->getModel();
+
+            if (!method_exists($model, 'scopedFlags')) {
+                return $this;
+            }
+
+            $availableFlags = $model->scopedFlags();
+            $validModes = ['only', 'with'];
+
+            foreach ($flags as $key => $mode) {
+                $mode = strtolower(trim($mode));
+
+                if (!in_array($mode, $validModes, true)) {
+                    continue;
+                }
+
+                if (!array_key_exists($key, $availableFlags)) {
+                    continue;
+                }
+
+                $method = $mode . 'Scope';
+
+                if (method_exists($this, $method)) {
+                    $this->$method($key);
+                }
+            }
+
+            return $this;
+        });
 
         return $next($request);
     }
