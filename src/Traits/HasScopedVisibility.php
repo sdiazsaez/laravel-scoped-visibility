@@ -46,8 +46,7 @@ trait HasScopedVisibility {
         return 'scoped_flag:' . $key;
     }
 
-
-    public function scopeApplyVisibility(Builder $query, array $flags = []): Builder
+    public function scopeApplyVisibility(Builder $query, string|array $flags = []): Builder
     {
         $model = $query->getModel();
 
@@ -58,23 +57,47 @@ trait HasScopedVisibility {
         $availableFlags = $model->scopedFlags();
         $validModes = ['only', 'with', 'without'];
 
-        foreach ($flags as $key => $mode) {
-            $mode = strtolower(trim($mode));
+        $normalized = [];
 
-            if (!in_array($mode, $validModes, true)) {
-                continue;
+        // 1. Normalize input into flag => mode
+        if (is_string($flags)) {
+            if (str_contains($flags, '|')) {
+                // single 'flag|mode' string
+                [$flag, $mode] = array_map('trim', explode('|', $flags) + [null, null]);
+                if ($flag && in_array($mode, $validModes, true)) {
+                    $normalized[$flag] = $mode;
+                }
+            } elseif (in_array($flags, $validModes, true)) {
+                // global mode: apply to all
+                foreach (array_keys($availableFlags) as $flag) {
+                    $normalized[$flag] = $flags;
+                }
             }
+        } elseif (is_array($flags)) {
+            foreach ($flags as $key => $value) {
+                // Handle both ['flag' => 'mode'] and ['flag|mode']
+                if (is_int($key) && str_contains($value, '|')) {
+                    [$flag, $mode] = array_map('trim', explode('|', $value) + [null, null]);
+                } else {
+                    $flag = trim((string) $key);
+                    $mode = trim((string) $value);
+                }
 
-            if (!array_key_exists($key, $availableFlags)) {
-                continue;
+                if ($flag && in_array($mode, $validModes, true)) {
+                    $normalized[$flag] = $mode;
+                }
             }
+        }
 
-            $query->{$mode . 'Scope'}($key);
+        // 2. Apply all scoped flags
+        foreach ($normalized as $flag => $mode) {
+            if (array_key_exists($flag, $availableFlags)) {
+                $query->{$mode . 'Scope'}($flag);
+            }
         }
 
         return $query;
     }
-
 
 
     /**
